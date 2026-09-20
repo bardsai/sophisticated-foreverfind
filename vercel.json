@@ -1,0 +1,10 @@
+{
+  "buildCommand": "bun run build:web",
+  "outputDirectory": "dist",
+  "installCommand": "bun install",
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/profile/:id", "destination": "/profile/[id]" },
+    { "source": "/chat/:matchId", "destination": "/chat/[matchId]" }
+  ]
+}

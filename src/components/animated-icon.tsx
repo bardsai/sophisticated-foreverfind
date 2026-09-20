@@ -1,16 +1,32 @@
 import { Image } from 'expo-image';
 import * as SplashScreen from 'expo-splash-screen';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import Animated, { Easing, Keyframe } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 
+import { Colors } from '@/constants/theme';
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useProfile } from '@/hooks/use-profile';
+import { useSession } from '@/hooks/use-session';
+
 const INITIAL_SCALE_FACTOR = Dimensions.get('screen').height / 90;
 const DURATION = 600;
 
-export function AnimatedSplashOverlay() {
+export function AnimatedSplashOverlay({ ready }: { ready: boolean }) {
   const [animate, setAnimate] = useState(false);
   const [visible, setVisible] = useState(true);
+  const scheme = useColorScheme();
+  const isDark = scheme === 'dark';
+  const { session, isLoading: sessionLoading } = useSession();
+  const { isLoading: profileLoading } = useProfile();
+  const dataReady = !sessionLoading && (!session || !profileLoading);
+
+  useEffect(() => {
+    if (ready && dataReady) {
+      SplashScreen.hideAsync().finally(() => setAnimate(true));
+    }
+  }, [ready, dataReady]);
 
   if (!visible) return null;
 
@@ -33,7 +49,22 @@ export function AnimatedSplashOverlay() {
     },
   });
 
-  const image = <Image style={styles.image} source={require('@/assets/images/expo-logo.png')} />;
+  const image = (
+    <Image
+      style={styles.brandImage}
+      contentFit="contain"
+      source={
+        isDark
+          ? require('@/assets/images/logo-mark-dark.png')
+          : require('@/assets/images/logo-mark.png')
+      }
+    />
+  );
+
+  const overlayStyle = [
+    styles.splashOverlay,
+    { backgroundColor: isDark ? Colors.dark.background : Colors.light.background },
+  ];
 
   return animate ? (
     <Animated.View
@@ -43,19 +74,11 @@ export function AnimatedSplashOverlay() {
           scheduleOnRN(setVisible, false);
         }
       })}
-      style={styles.splashOverlay}>
+      style={overlayStyle}>
       {image}
     </Animated.View>
   ) : (
-    <View
-      onLayout={() => {
-        SplashScreen.hideAsync().finally(() => {
-          setAnimate(true);
-        });
-      }}
-      style={styles.splashOverlay}>
-      {image}
-    </View>
+    <View style={overlayStyle}>{image}</View>
   );
 }
 
@@ -131,6 +154,10 @@ const styles = StyleSheet.create({
     width: 76,
     height: 71,
   },
+  brandImage: {
+    width: 260,
+    height: 104,
+  },
   background: {
     borderRadius: 40,
     experimental_backgroundImage: `linear-gradient(180deg, #3C9FFE, #0274DF)`,
@@ -140,7 +167,6 @@ const styles = StyleSheet.create({
   },
   splashOverlay: {
     ...StyleSheet.absoluteFill,
-    backgroundColor: '#208AEF',
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 1000,
