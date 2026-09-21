@@ -65,10 +65,10 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "0212d262-ed9f-47e4-b840-1c9be5bb8205"
+        "projectId": "91453b1e-b6ca-4bf8-a547-5fcaa6768dc5"
       }
     },
-    "owner": "bardsai",
+    "owner": "frankimma",
     "ios": {
       "bundleIdentifier": "com.bardsai.foreverfind",
       "infoPlist": {
