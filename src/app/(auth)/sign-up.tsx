@@ -1,18 +1,16 @@
 import { makeRedirectUri } from 'expo-auth-session';
 import { Link, router } from 'expo-router';
 import { useRef, useState } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 
-import { BrandMark } from '@/components/brand-mark';
+import { AuthScreen } from '@/components/auth-screen';
 import { DateField } from '@/components/date-field';
 import { PrimaryButton } from '@/components/primary-button';
 import { TextField } from '@/components/text-field';
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
 import { entranceAnimation, fadeInAnimation } from '@/constants/motion';
-import { MaxContentWidth, Spacing } from '@/constants/theme';
+import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { supabase } from '@/lib/supabase';
 import {
@@ -90,28 +88,20 @@ export default function SignUpScreen() {
   }
 
   return (
-    <ThemedView style={styles.flex}>
-      <SafeAreaView style={styles.flex}>
-        <KeyboardAvoidingView
-          style={styles.flex}
-          behavior={Platform.select({ ios: 'padding', default: undefined })}>
-          <ScrollView
-            contentContainerStyle={styles.scrollContent}
-            keyboardShouldPersistTaps="handled">
-            <Animated.View entering={entranceAnimation()}>
-              <BrandMark width={200} />
-            </Animated.View>
-
-            <Animated.View entering={entranceAnimation(80)} style={styles.titleBlock}>
-              <ThemedText type="subtitle" style={styles.centerText}>
-                Create your account
-              </ThemedText>
-              <ThemedText themeColor="textSecondary" style={styles.centerText}>
-                Every introduction is reviewed by our team before you connect
-              </ThemedText>
-            </Animated.View>
-
-            <Animated.View entering={entranceAnimation(160)} style={styles.form}>
+    <AuthScreen
+      title="Create your account"
+      subtitle="Every introduction is reviewed by our team before you connect."
+      footer={
+        <>
+          <ThemedText themeColor="textSecondary">Already have an account?</ThemedText>
+          <Link href="/login" replace>
+            <ThemedText themeColor="primary" type="smallBold">
+              Log in
+            </ThemedText>
+          </Link>
+        </>
+      }>
+      <Animated.View entering={entranceAnimation(80)} style={styles.form}>
               <TextField
                 label="Name"
                 value={displayName}
@@ -208,51 +198,14 @@ export default function SignUpScreen() {
               ) : null}
 
               <PrimaryButton title="Create account" loading={loading} onPress={handleSignUp} />
-            </Animated.View>
-
-            <ThemedView style={styles.footerRow}>
-              <ThemedText themeColor="textSecondary">Already have an account?</ThemedText>
-              <Link href="/login" replace>
-                <ThemedText themeColor="primary" type="smallBold">
-                  Log in
-                </ThemedText>
-              </Link>
-            </ThemedView>
-          </ScrollView>
-        </KeyboardAvoidingView>
-      </SafeAreaView>
-    </ThemedView>
+      </Animated.View>
+    </AuthScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  flex: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignSelf: 'center',
-    width: '100%',
-    maxWidth: MaxContentWidth,
-    paddingHorizontal: Spacing.four,
-    paddingVertical: Spacing.six,
-    gap: Spacing.five,
-  },
-  titleBlock: {
-    gap: Spacing.one,
-  },
-  centerText: {
-    textAlign: 'center',
-  },
   form: {
     gap: Spacing.three,
-    paddingHorizontal: Spacing.four,
-  },
-  footerRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: Spacing.one,
   },
   termsRow: {
     flexDirection: 'row',

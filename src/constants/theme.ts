@@ -12,13 +12,13 @@ import { Platform } from 'react-native';
 // against a near-black background rather than the raw brand colors.
 export const Colors = {
   light: {
-    text: '#1B1523',
-    textSecondary: '#6B5F7A',
-    background: '#FFFFFF',
-    backgroundElement: '#F5F1FA',
-    backgroundSelected: '#EBE0F5',
-    border: '#E3D8EF',
-    primary: '#662D91',
+    text: '#211829',
+    textSecondary: '#64576F',
+    background: '#FCFAFD',
+    backgroundElement: '#F5EFF8',
+    backgroundSelected: '#E9DDF1',
+    border: '#DCCFE5',
+    primary: '#612C8A',
     primaryText: '#FFFFFF',
     accent: '#ED1E79',
     accentText: '#FFFFFF',
@@ -26,18 +26,18 @@ export const Colors = {
     tint: '#662D91',
   },
   dark: {
-    text: '#F3EEFA',
-    textSecondary: '#B6A9C7',
-    background: '#0F0B15',
-    backgroundElement: '#1C1526',
-    backgroundSelected: '#2A2036',
-    border: '#332941',
-    primary: '#AB82D4',
-    primaryText: '#1B1523',
-    accent: '#FF6FA8',
-    accentText: '#1B1523',
-    danger: '#F1608F',
-    tint: '#AB82D4',
+    text: '#F5EFF8',
+    textSecondary: '#C1B3CE',
+    background: '#100C14',
+    backgroundElement: '#1D1624',
+    backgroundSelected: '#30233A',
+    border: '#44344F',
+    primary: '#B78ADB',
+    primaryText: '#211829',
+    accent: '#FF78AA',
+    accentText: '#211829',
+    danger: '#FF779B',
+    tint: '#B78ADB',
   },
 } as const;
 
@@ -94,3 +94,6 @@ export const Spacing = {
 // safe-area inset, since this constant can't read insets.bottom itself.
 export const BottomTabInset = Platform.select({ ios: 50, android: 80, web: 90 }) ?? 0;
 export const MaxContentWidth = 800;
+export const MaxAuthWidth = 460;
+export const MaxFeedWidth = 1040;
+export const MaxProfilePhotoWidth = 520;

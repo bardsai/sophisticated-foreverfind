@@ -117,6 +117,7 @@ export function DateField({
 const styles = StyleSheet.create({
   container: {
     gap: Spacing.one,
+    backgroundColor: 'transparent',
   },
   input: {
     borderWidth: 1.5,

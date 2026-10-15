@@ -1,5 +1,5 @@
 import { useState, type CSSProperties } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, useColorScheme } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -36,6 +36,7 @@ export function DateField({
   minimumDate,
 }: DateFieldProps) {
   const theme = useTheme();
+  const colorScheme = useColorScheme();
   const [focused, setFocused] = useState(false);
 
   const borderColor = error ? theme.danger : focused ? theme.primary : theme.border;
@@ -51,6 +52,7 @@ export function DateField({
     paddingBottom: Spacing.two + 2,
     fontSize: 16,
     fontFamily: MonaSans.medium,
+    colorScheme: colorScheme === 'dark' ? 'dark' : 'light',
     backgroundColor: theme.backgroundElement,
     color: theme.text,
     outline: 'none',
@@ -89,5 +91,6 @@ export function DateField({
 const styles = StyleSheet.create({
   container: {
     gap: Spacing.one,
+    backgroundColor: 'transparent',
   },
 });

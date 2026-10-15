@@ -1,11 +1,12 @@
 import { Image } from 'expo-image';
-import { useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { PrimaryButton } from '@/components/primary-button';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { useSession } from '@/hooks/use-session';
 import { useTheme } from '@/hooks/use-theme';
@@ -137,9 +138,19 @@ export default function RequestsScreen() {
           ) : null}
 
           {!loading && needsResponse.length === 0 && sent.length === 0 ? (
-            <ThemedText themeColor="textSecondary" style={styles.empty}>
-              Requests you send or receive will show up here.
-            </ThemedText>
+            <View style={styles.emptyState}>
+              <ThemedText type="smallBold" style={styles.emptyTitle}>
+                No introductions in progress
+              </ThemedText>
+              <ThemedText themeColor="textSecondary" style={styles.empty}>
+                Send a request from someone&apos;s profile and we&apos;ll keep you updated here.
+              </ThemedText>
+              <PrimaryButton
+                title="Discover people"
+                onPress={() => router.push('/')}
+                style={styles.emptyAction}
+              />
+            </View>
           ) : null}
         </ScrollView>
       </SafeAreaView>
@@ -247,6 +258,17 @@ const styles = StyleSheet.create({
   },
   empty: {
     textAlign: 'center',
+  },
+  emptyState: {
+    alignItems: 'center',
+    gap: Spacing.two,
     marginTop: Spacing.six,
+  },
+  emptyTitle: {
+    textAlign: 'center',
+  },
+  emptyAction: {
+    marginTop: Spacing.two,
+    width: '100%',
   },
 });

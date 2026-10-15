@@ -4,6 +4,7 @@ import { useCallback, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { PrimaryButton } from '@/components/primary-button';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
@@ -82,9 +83,19 @@ export default function MessagesScreen() {
           {loading ? <ActivityIndicator style={styles.loading} /> : null}
 
           {!loading && conversations.length === 0 ? (
-            <ThemedText themeColor="textSecondary" style={styles.empty}>
-              Once you match with someone, you can message them here.
-            </ThemedText>
+            <View style={styles.emptyState}>
+              <ThemedText type="smallBold" style={styles.emptyTitle}>
+                Your conversations start with a match
+              </ThemedText>
+              <ThemedText themeColor="textSecondary" style={styles.empty}>
+                When you match with someone, you can get to know each other here.
+              </ThemedText>
+              <PrimaryButton
+                title="Discover people"
+                onPress={() => router.push('/')}
+                style={styles.emptyAction}
+              />
+            </View>
           ) : null}
 
           {conversations.map((c) => (
@@ -130,7 +141,18 @@ const styles = StyleSheet.create({
   },
   empty: {
     textAlign: 'center',
+  },
+  emptyState: {
+    alignItems: 'center',
+    gap: Spacing.two,
     marginTop: Spacing.six,
+  },
+  emptyTitle: {
+    textAlign: 'center',
+  },
+  emptyAction: {
+    marginTop: Spacing.two,
+    width: '100%',
   },
   row: {
     flexDirection: 'row',

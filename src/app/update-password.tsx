@@ -1,15 +1,13 @@
 import { useRef, useState } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Pressable, StyleSheet, TextInput } from 'react-native';
 import Animated from 'react-native-reanimated';
 
-import { BrandMark } from '@/components/brand-mark';
+import { AuthScreen } from '@/components/auth-screen';
 import { PrimaryButton } from '@/components/primary-button';
 import { TextField } from '@/components/text-field';
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
 import { entranceAnimation, fadeInAnimation } from '@/constants/motion';
-import { MaxContentWidth, Spacing } from '@/constants/theme';
+import { Spacing } from '@/constants/theme';
 import { useSession } from '@/hooks/use-session';
 import { supabase } from '@/lib/supabase';
 import { passwordError } from '@/lib/validation';
@@ -47,28 +45,21 @@ export default function UpdatePasswordScreen() {
   }
 
   return (
-    <ThemedView style={styles.flex}>
-      <SafeAreaView style={styles.flex}>
-        <KeyboardAvoidingView
-          style={styles.flex}
-          behavior={Platform.select({ ios: 'padding', default: undefined })}>
-          <ScrollView
-            contentContainerStyle={styles.scrollContent}
-            keyboardShouldPersistTaps="handled">
-            <Animated.View entering={entranceAnimation()}>
-              <BrandMark width={200} />
-            </Animated.View>
-
-            <Animated.View entering={entranceAnimation(80)} style={styles.titleBlock}>
-              <ThemedText type="subtitle" style={styles.centerText}>
-                Choose a new password
-              </ThemedText>
-              <ThemedText themeColor="textSecondary" style={styles.centerText}>
-                This replaces your old password on ForeverFind.
-              </ThemedText>
-            </Animated.View>
-
-            <Animated.View entering={entranceAnimation(160)} style={styles.form}>
+    <AuthScreen
+      title="Choose a new password"
+      subtitle="This replaces your old password on ForeverFind."
+      footer={
+        <Pressable
+          onPress={() => signOut()}
+          hitSlop={8}
+          accessibilityRole="button"
+          style={styles.cancelAction}>
+          <ThemedText themeColor="textSecondary" type="small">
+            Cancel and sign out
+          </ThemedText>
+        </Pressable>
+      }>
+      <Animated.View entering={entranceAnimation(80)} style={styles.form}>
               <TextField
                 label="New password"
                 value={password}
@@ -103,42 +94,17 @@ export default function UpdatePasswordScreen() {
               ) : null}
 
               <PrimaryButton title="Update password" loading={loading} onPress={handleSubmit} />
-            </Animated.View>
-
-            <Pressable onPress={() => signOut()} hitSlop={8}>
-              <ThemedText themeColor="textSecondary" type="small" style={styles.centerText}>
-                Cancel and sign out
-              </ThemedText>
-            </Pressable>
-          </ScrollView>
-        </KeyboardAvoidingView>
-      </SafeAreaView>
-    </ThemedView>
+      </Animated.View>
+    </AuthScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  flex: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignSelf: 'center',
-    width: '100%',
-    maxWidth: MaxContentWidth,
-    paddingHorizontal: Spacing.four,
-    paddingVertical: Spacing.six,
-    gap: Spacing.five,
-  },
-  titleBlock: {
-    gap: Spacing.one,
-  },
-  centerText: {
-    textAlign: 'center',
-  },
   form: {
     gap: Spacing.three,
-    paddingHorizontal: Spacing.four,
+  },
+  cancelAction: {
+    minHeight: 44,
+    justifyContent: 'center',
   },
 });

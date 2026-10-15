@@ -9,7 +9,7 @@ import Animated, {
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Spacing } from '@/constants/theme';
+import { MonaSans, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
@@ -96,6 +96,7 @@ export function TextField({
 const styles = StyleSheet.create({
   container: {
     gap: Spacing.one,
+    backgroundColor: 'transparent',
   },
   inputWrapper: {
     justifyContent: 'center',
@@ -106,6 +107,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.three,
     paddingVertical: Spacing.two + 2,
     fontSize: 16,
+    fontFamily: MonaSans.medium,
+    minHeight: 48,
+    width: '100%',
   },
   inputWithToggle: {
     paddingRight: Spacing.four + Spacing.three,

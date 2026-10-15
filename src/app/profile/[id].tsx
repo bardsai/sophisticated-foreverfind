@@ -10,9 +10,10 @@ import { Tag } from '@/components/tag';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { INTEREST_OPTIONS } from '@/constants/onboarding-options';
-import { MaxContentWidth, Spacing } from '@/constants/theme';
+import { MaxContentWidth, MaxProfilePhotoWidth, Spacing } from '@/constants/theme';
 import type { Profile } from '@/hooks/use-profile';
 import { useSession } from '@/hooks/use-session';
+import { useTheme } from '@/hooks/use-theme';
 import { calculateAge, formatLocationLine } from '@/lib/profile-utils';
 import { supabase } from '@/lib/supabase';
 
@@ -26,6 +27,7 @@ type RequestStatus =
 
 export default function ProfileDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const theme = useTheme();
   const { session } = useSession();
   const userId = session!.user.id;
 
@@ -141,9 +143,13 @@ export default function ProfileDetailScreen() {
       <Stack.Screen options={{ headerShown: true, title: profile.display_name }} />
       <SafeAreaView style={styles.flex} edges={['bottom']}>
         <ScrollView contentContainerStyle={styles.content}>
-          <View style={[styles.photo, { backgroundColor: '#00000010' }]}>
+          <View style={[styles.photo, { backgroundColor: theme.backgroundSelected }]}>
             {profile.primary_photo_url ? (
-              <Image source={{ uri: profile.primary_photo_url }} style={styles.photoImage} />
+              <Image
+                source={{ uri: profile.primary_photo_url }}
+                style={styles.photoImage}
+                accessibilityLabel={`${profile.display_name}'s profile photo`}
+              />
             ) : (
               <ThemedText themeColor="textSecondary">No photo</ThemedText>
             )}
@@ -232,9 +238,11 @@ const styles = StyleSheet.create({
   },
   photo: {
     width: '100%',
+    maxWidth: MaxProfilePhotoWidth,
     aspectRatio: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    alignSelf: 'center',
   },
   photoImage: {
     width: '100%',

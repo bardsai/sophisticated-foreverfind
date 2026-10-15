@@ -1,21 +1,33 @@
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { FlatList, RefreshControl, StyleSheet } from 'react-native';
+import {
+  ActivityIndicator,
+  FlatList,
+  Pressable,
+  RefreshControl,
+  StyleSheet,
+  View,
+  useWindowDimensions,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ProfileCard } from '@/components/profile-card';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { BottomTabInset, MaxFeedWidth, Spacing } from '@/constants/theme';
 import { useSession } from '@/hooks/use-session';
+import { useTheme } from '@/hooks/use-theme';
 import type { Profile } from '@/hooks/use-profile';
 import { hasSharedLocation } from '@/lib/location';
 import { birthdateBoundsForAgeRange } from '@/lib/profile-utils';
 import { supabase } from '@/lib/supabase';
 
 export default function DiscoverScreen() {
+  const theme = useTheme();
   const { session } = useSession();
   const userId = session!.user.id;
+  const { width } = useWindowDimensions();
+  const numColumns = width >= 760 ? 3 : 2;
 
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [requestedIds, setRequestedIds] = useState<Set<string>>(new Set());
@@ -83,23 +95,42 @@ export default function DiscoverScreen() {
     <ThemedView style={styles.flex}>
       <SafeAreaView style={styles.flex}>
         <FlatList
+          key={numColumns}
           data={profiles}
           keyExtractor={(item) => item.id}
-          numColumns={2}
+          numColumns={numColumns}
           columnWrapperStyle={styles.row}
           contentContainerStyle={styles.content}
           refreshControl={<RefreshControl refreshing={loading} onRefresh={load} />}
           ListHeaderComponent={
-            <ThemedText type="title" style={styles.title}>
-              Discover
-            </ThemedText>
+            <View style={styles.header}>
+              <ThemedText type="title">Discover</ThemedText>
+              <ThemedText themeColor="textSecondary">
+                Thoughtful introductions, chosen with care.
+              </ThemedText>
+            </View>
           }
           ListEmptyComponent={
-            !loading ? (
-              <ThemedText themeColor="textSecondary" style={styles.empty}>
-                No one new to introduce right now — check back soon.
-              </ThemedText>
-            ) : null
+            loading ? (
+              <ActivityIndicator style={styles.loading} color={theme.primary} />
+            ) : (
+              <View style={styles.emptyState}>
+                <ThemedText type="smallBold" style={styles.emptyText}>
+                  No new introductions just yet
+                </ThemedText>
+                <ThemedText themeColor="textSecondary" style={styles.emptyText}>
+                  Check back soon, or broaden your preferences to meet more people.
+                </ThemedText>
+                <Pressable
+                  onPress={() => router.push('/edit-partner-preferences')}
+                  accessibilityRole="button"
+                  style={styles.emptyAction}>
+                  <ThemedText type="smallBold" themeColor="primary">
+                    Review preferences
+                  </ThemedText>
+                </Pressable>
+              </View>
+            )
           }
           renderItem={({ item }) => (
             <ProfileCard
@@ -122,19 +153,33 @@ const styles = StyleSheet.create({
   content: {
     alignSelf: 'center',
     width: '100%',
-    maxWidth: MaxContentWidth,
+    maxWidth: MaxFeedWidth,
     paddingHorizontal: Spacing.four,
     paddingBottom: BottomTabInset + Spacing.four,
     gap: Spacing.three,
   },
-  title: {
+  header: {
+    gap: Spacing.one,
     marginBottom: Spacing.two,
   },
   row: {
     gap: Spacing.three,
   },
-  empty: {
-    textAlign: 'center',
+  loading: {
     marginTop: Spacing.six,
+  },
+  emptyState: {
+    marginTop: Spacing.six,
+    alignItems: 'center',
+    gap: Spacing.two,
+    paddingHorizontal: Spacing.four,
+  },
+  emptyText: {
+    textAlign: 'center',
+  },
+  emptyAction: {
+    minHeight: 44,
+    justifyContent: 'center',
+    paddingHorizontal: Spacing.two,
   },
 });

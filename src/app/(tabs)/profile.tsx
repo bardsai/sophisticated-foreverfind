@@ -8,7 +8,7 @@ import { Tag } from '@/components/tag';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { INTEREST_OPTIONS } from '@/constants/onboarding-options';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { BottomTabInset, MaxContentWidth, MaxProfilePhotoWidth, Spacing } from '@/constants/theme';
 import { useIsAdmin } from '@/hooks/use-is-admin';
 import { useProfile } from '@/hooks/use-profile';
 import { useSession } from '@/hooks/use-session';
@@ -31,7 +31,11 @@ export default function ProfileScreen() {
         <ScrollView contentContainerStyle={styles.content}>
           <View style={[styles.photo, { backgroundColor: theme.backgroundSelected }]}>
             {profile.primary_photo_url ? (
-              <Image source={{ uri: profile.primary_photo_url }} style={styles.photoImage} />
+              <Image
+                source={{ uri: profile.primary_photo_url }}
+                style={styles.photoImage}
+                accessibilityLabel={`${profile.display_name}'s profile photo`}
+              />
             ) : (
               <ThemedText themeColor="textSecondary">No photo</ThemedText>
             )}
@@ -110,9 +114,11 @@ const styles = StyleSheet.create({
   },
   photo: {
     width: '100%',
+    maxWidth: MaxProfilePhotoWidth,
     aspectRatio: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    alignSelf: 'center',
   },
   photoImage: {
     width: '100%',

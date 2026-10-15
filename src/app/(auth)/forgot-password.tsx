@@ -1,17 +1,15 @@
 import { makeRedirectUri } from 'expo-auth-session';
 import { Link, router } from 'expo-router';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { StyleSheet } from 'react-native';
 import Animated from 'react-native-reanimated';
 
-import { BrandMark } from '@/components/brand-mark';
+import { AuthScreen } from '@/components/auth-screen';
 import { PrimaryButton } from '@/components/primary-button';
 import { TextField } from '@/components/text-field';
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { entranceAnimation, fadeInAnimation } from '@/constants/motion';
-import { MaxContentWidth, Spacing } from '@/constants/theme';
+import { fadeInAnimation, entranceAnimation } from '@/constants/motion';
+import { Spacing } from '@/constants/theme';
 import { supabase } from '@/lib/supabase';
 import { emailError } from '@/lib/validation';
 
@@ -45,28 +43,20 @@ export default function ForgotPasswordScreen() {
   }
 
   return (
-    <ThemedView style={styles.flex}>
-      <SafeAreaView style={styles.flex}>
-        <KeyboardAvoidingView
-          style={styles.flex}
-          behavior={Platform.select({ ios: 'padding', default: undefined })}>
-          <ScrollView
-            contentContainerStyle={styles.scrollContent}
-            keyboardShouldPersistTaps="handled">
-            <Animated.View entering={entranceAnimation()}>
-              <BrandMark width={200} />
-            </Animated.View>
-
-            <Animated.View entering={entranceAnimation(80)} style={styles.titleBlock}>
-              <ThemedText type="subtitle" style={styles.centerText}>
-                Reset your password
-              </ThemedText>
-              <ThemedText themeColor="textSecondary" style={styles.centerText}>
-                Enter your email and we&apos;ll send you a link to choose a new one.
-              </ThemedText>
-            </Animated.View>
-
-            <Animated.View entering={entranceAnimation(160)} style={styles.form}>
+    <AuthScreen
+      title="Reset your password"
+      subtitle="Enter your email and we'll send you a link to choose a new one."
+      footer={
+        <>
+          <ThemedText themeColor="textSecondary">Remembered it?</ThemedText>
+          <Link href="/login" replace>
+            <ThemedText themeColor="primary" type="smallBold">
+              Log in
+            </ThemedText>
+          </Link>
+        </>
+      }>
+      <Animated.View entering={entranceAnimation(80)} style={styles.form}>
               <TextField
                 label="Email"
                 value={email}
@@ -89,50 +79,13 @@ export default function ForgotPasswordScreen() {
               ) : null}
 
               <PrimaryButton title="Send reset link" loading={loading} onPress={handleSubmit} />
-            </Animated.View>
-
-            <ThemedView style={styles.footerRow}>
-              <ThemedText themeColor="textSecondary">Remembered it?</ThemedText>
-              <Link href="/login" replace>
-                <ThemedText themeColor="primary" type="smallBold">
-                  Log in
-                </ThemedText>
-              </Link>
-            </ThemedView>
-          </ScrollView>
-        </KeyboardAvoidingView>
-      </SafeAreaView>
-    </ThemedView>
+      </Animated.View>
+    </AuthScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  flex: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignSelf: 'center',
-    width: '100%',
-    maxWidth: MaxContentWidth,
-    paddingHorizontal: Spacing.four,
-    paddingVertical: Spacing.six,
-    gap: Spacing.five,
-  },
-  titleBlock: {
-    gap: Spacing.one,
-  },
-  centerText: {
-    textAlign: 'center',
-  },
   form: {
     gap: Spacing.three,
-    paddingHorizontal: Spacing.four,
-  },
-  footerRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: Spacing.one,
   },
 });

@@ -48,13 +48,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontFamily: MonaSans.semiBold,
-    fontSize: 48,
-    lineHeight: 52,
+    fontSize: 40,
+    lineHeight: 48,
   },
   subtitle: {
     fontFamily: MonaSans.semiBold,
-    fontSize: 32,
-    lineHeight: 44,
+    fontSize: 28,
+    lineHeight: 36,
   },
   link: {
     fontFamily: MonaSans.regular,

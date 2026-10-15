@@ -21,7 +21,13 @@ export function ProfileCard({ profile, requested, distanceKm, onPress }: Profile
   return (
     <Pressable
       onPress={onPress}
-      style={[styles.card, { backgroundColor: theme.backgroundElement, borderColor: theme.border }]}>
+      accessibilityRole="button"
+      accessibilityLabel={`${profile.display_name}${profile.birthdate ? `, ${calculateAge(profile.birthdate)}` : ''}${locationLine ? `, ${locationLine}` : ''}`}
+      style={({ pressed }) => [
+        styles.card,
+        { backgroundColor: theme.backgroundElement, borderColor: theme.border },
+        pressed && styles.pressed,
+      ]}>
       <View style={[styles.photo, { backgroundColor: theme.backgroundSelected }]}>
         {profile.primary_photo_url ? (
           <Image source={{ uri: profile.primary_photo_url }} style={styles.photoImage} />
@@ -60,7 +66,7 @@ const styles = StyleSheet.create({
   card: {
     flex: 1,
     borderRadius: 16,
-    borderWidth: 1.5,
+    borderWidth: 1,
     overflow: 'hidden',
   },
   photo: {
@@ -79,5 +85,8 @@ const styles = StyleSheet.create({
   },
   requestedLabel: {
     marginTop: 2,
+  },
+  pressed: {
+    opacity: 0.82,
   },
 });
