@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { PrimaryButton } from '@/components/primary-button';
+import { PageHeading } from '@/components/page-heading';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { useSession } from '@/hooks/use-session';
 import { useTheme } from '@/hooks/use-theme';
@@ -85,7 +86,10 @@ export default function RequestsScreen() {
     <ThemedView style={styles.flex}>
       <SafeAreaView style={styles.flex}>
         <ScrollView contentContainerStyle={styles.content}>
-          <ThemedText type="title">Requests</ThemedText>
+          <PageHeading
+            title="Requests"
+            subtitle="Follow the progress of requests you send and receive."
+          />
 
           {loading ? <ActivityIndicator style={styles.loading} /> : null}
 

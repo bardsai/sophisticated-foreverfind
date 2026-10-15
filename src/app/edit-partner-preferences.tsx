@@ -117,14 +117,14 @@ export default function EditPartnerPreferencesScreen() {
                   value={minAge}
                   onChangeText={(text) => setMinAge(text.replace(/[^0-9]/g, ''))}
                   keyboardType="number-pad"
-                  style={styles.ageInput}
+                  containerStyle={styles.ageInput}
                 />
                 <TextField
                   label="Maximum age"
                   value={maxAge}
                   onChangeText={(text) => setMaxAge(text.replace(/[^0-9]/g, ''))}
                   keyboardType="number-pad"
-                  style={styles.ageInput}
+                  containerStyle={styles.ageInput}
                 />
               </View>
             </Section>
@@ -234,9 +234,11 @@ const styles = StyleSheet.create({
   ageRow: {
     flexDirection: 'row',
     gap: Spacing.three,
+    width: '100%',
   },
   ageInput: {
     flex: 1,
+    minWidth: 0,
   },
   chipGrid: {
     flexDirection: 'row',

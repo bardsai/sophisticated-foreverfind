@@ -5,6 +5,7 @@ import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'reac
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PrimaryButton } from '@/components/primary-button';
+import { PageHeading } from '@/components/page-heading';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
@@ -78,7 +79,10 @@ export default function MessagesScreen() {
     <ThemedView style={styles.flex}>
       <SafeAreaView style={styles.flex}>
         <ScrollView contentContainerStyle={styles.content}>
-          <ThemedText type="title">Messages</ThemedText>
+          <PageHeading
+            title="Messages"
+            subtitle="Conversations with people you’ve met."
+          />
 
           {loading ? <ActivityIndicator style={styles.loading} /> : null}
 
@@ -102,7 +106,13 @@ export default function MessagesScreen() {
             <Pressable
               key={c.matchId}
               onPress={() => router.push({ pathname: '/chat/[matchId]', params: { matchId: c.matchId } })}
-              style={[styles.row, { backgroundColor: theme.backgroundElement, borderColor: theme.border }]}>
+              accessibilityRole="button"
+              accessibilityLabel={`Conversation with ${c.otherPerson.display_name}${c.lastMessage ? `: ${c.lastMessage.body}` : ''}`}
+              style={({ pressed }) => [
+                styles.row,
+                { backgroundColor: theme.backgroundElement, borderColor: theme.border },
+                pressed && styles.pressed,
+              ]}>
               <View style={[styles.avatar, { backgroundColor: theme.backgroundSelected }]}>
                 {c.otherPerson.primary_photo_url ? (
                   <Image source={{ uri: c.otherPerson.primary_photo_url }} style={styles.avatarImage} />
@@ -161,6 +171,9 @@ const styles = StyleSheet.create({
     padding: Spacing.two,
     borderRadius: 14,
     borderWidth: 1.5,
+  },
+  pressed: {
+    opacity: 0.78,
   },
   avatar: {
     width: 52,

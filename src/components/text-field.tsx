@@ -1,5 +1,13 @@
 import { useState, type Ref } from 'react';
-import { Pressable, StyleSheet, TextInput, View, type TextInputProps } from 'react-native';
+import {
+  Pressable,
+  StyleSheet,
+  TextInput,
+  View,
+  type StyleProp,
+  type TextInputProps,
+  type ViewStyle,
+} from 'react-native';
 import Animated, {
   interpolateColor,
   useAnimatedStyle,
@@ -17,6 +25,7 @@ const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 export type TextFieldProps = TextInputProps & {
   label: string;
   error?: string;
+  containerStyle?: StyleProp<ViewStyle>;
   ref?: Ref<TextInput>;
 };
 
@@ -24,6 +33,7 @@ export function TextField({
   label,
   error,
   style,
+  containerStyle,
   ref,
   onFocus,
   onBlur,
@@ -43,7 +53,7 @@ export function TextField({
   }));
 
   return (
-    <ThemedView style={styles.container}>
+    <ThemedView style={[styles.container, containerStyle]}>
       <ThemedText type="smallBold" themeColor="textSecondary">
         {label}
       </ThemedText>

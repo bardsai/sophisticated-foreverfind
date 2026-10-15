@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ProfileCard } from '@/components/profile-card';
+import { PageHeading } from '@/components/page-heading';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxFeedWidth, Spacing } from '@/constants/theme';
@@ -103,11 +104,23 @@ export default function DiscoverScreen() {
           contentContainerStyle={styles.content}
           refreshControl={<RefreshControl refreshing={loading} onRefresh={load} />}
           ListHeaderComponent={
-            <View style={styles.header}>
-              <ThemedText type="title">Discover</ThemedText>
-              <ThemedText themeColor="textSecondary">
-                Thoughtful introductions, chosen with care.
-              </ThemedText>
+            <View>
+              <PageHeading
+                title="Discover"
+                subtitle="A considered set of people to get to know."
+                action={{
+                  label: 'Preferences',
+                  onPress: () => router.push('/edit-partner-preferences'),
+                }}
+              />
+              <View style={styles.sectionHeader}>
+                <ThemedText type="smallBold" themeColor="textSecondary">
+                  YOUR DISCOVER FEED
+                </ThemedText>
+                <ThemedText type="small" themeColor="textSecondary">
+                  {loading ? 'Finding introductions…' : `${profiles.length} profiles`}
+                </ThemedText>
+              </View>
             </View>
           }
           ListEmptyComponent={
@@ -158,8 +171,11 @@ const styles = StyleSheet.create({
     paddingBottom: BottomTabInset + Spacing.four,
     gap: Spacing.three,
   },
-  header: {
-    gap: Spacing.one,
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: Spacing.two,
     marginBottom: Spacing.two,
   },
   row: {

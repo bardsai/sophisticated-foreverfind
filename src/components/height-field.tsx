@@ -79,7 +79,7 @@ export function HeightField({ valueCm, onChangeCm, error }: HeightFieldProps) {
               }
               placeholder="5"
               keyboardType="number-pad"
-              style={styles.ftInInput}
+              containerStyle={styles.ftInField}
               autoFocus
             />
             <TextField
@@ -90,7 +90,7 @@ export function HeightField({ valueCm, onChangeCm, error }: HeightFieldProps) {
               }
               placeholder="3"
               keyboardType="number-pad"
-              style={styles.ftInInput}
+              containerStyle={styles.ftInField}
             />
           </View>
           {error ? (
@@ -115,8 +115,10 @@ const styles = StyleSheet.create({
   ftInRow: {
     flexDirection: 'row',
     gap: Spacing.three,
+    width: '100%',
   },
-  ftInInput: {
+  ftInField: {
     flex: 1,
+    minWidth: 0,
   },
 });
