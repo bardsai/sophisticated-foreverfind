@@ -272,6 +272,9 @@ export default function EditProfileScreen() {
             </Section>
 
             <Section title="Family">
+              <ThemedText type="small" themeColor="textSecondary">
+                These details describe you, not a preference about a match&apos;s children.
+              </ThemedText>
               <SelectField
                 label="Marital status"
                 value={maritalStatus}
@@ -280,12 +283,12 @@ export default function EditProfileScreen() {
               />
               <View style={styles.stepperRow}>
                 <ThemedText type="smallBold" themeColor="textSecondary">
-                  Children
+                  How many children do you have?
                 </ThemedText>
                 <Stepper value={childrenCount} onChange={setChildrenCount} />
               </View>
               <SelectField
-                label="Want (more) children?"
+                label="Would you like to have (more) children?"
                 value={wantsChildren}
                 options={WANTS_CHILDREN_OPTIONS}
                 onChange={setWantsChildren}

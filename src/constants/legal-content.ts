@@ -3,7 +3,7 @@ export type LegalSection = {
   paragraphs: string[];
 };
 
-export const LEGAL_LAST_UPDATED = 'August 20, 2026';
+export const LEGAL_LAST_UPDATED = 'October 28, 2026';
 
 // Placeholder contact — replace before shipping.
 export const SUPPORT_EMAIL = 'support@foreverfind.app';
@@ -13,7 +13,7 @@ export const PRIVACY_POLICY_SECTIONS: LegalSection[] = [
     heading: 'What we collect',
     paragraphs: [
       'To create your profile and find compatible introductions, we collect: your name, date of birth, gender, phone number, city and hometown, occupation, education level, religion, marital status, number of children and whether you want (more) children, genotype, height and physique, interests, and a bio and profile photo.',
-      'We also collect your partner preferences (age range, qualities, deal breakers, and maximum distance), and any messages you send within the app to a match.',
+      'We also collect your partner preferences (age range, preferred number of children in a match, qualities, deal breakers, and maximum distance), and any messages you send within the app to a match.',
       'If you enable notifications, we store a device push token so we can alert you about new requests, approvals, matches, and messages.',
     ],
   },

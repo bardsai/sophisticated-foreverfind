@@ -39,7 +39,7 @@ export default function DiscoverScreen() {
     setLoading(true);
     const { data: preferences } = await supabase
       .from('partner_preferences')
-      .select('min_age, max_age, max_distance_km')
+      .select('min_age, max_age, max_distance_km, preferred_children_count')
       .eq('id', userId)
       .maybeSingle();
     const { maxBirthdate, minBirthdateExclusive } = birthdateBoundsForAgeRange(
@@ -65,6 +65,12 @@ export default function DiscoverScreen() {
     ]);
 
     let candidates = profileRows ?? [];
+    const preferredChildrenCount = preferences?.preferred_children_count;
+    if (preferredChildrenCount !== null && preferredChildrenCount !== undefined) {
+      candidates = candidates.filter(
+        (profile) => profile.children_count === preferredChildrenCount,
+      );
+    }
     let nextDistanceById = new Map<string, number>();
 
     // Distance only filters candidates down if the user has both a distance

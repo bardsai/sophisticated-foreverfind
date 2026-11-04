@@ -197,6 +197,7 @@ export type Database = {
           max_age: number | null
           max_distance_km: number | null
           min_age: number | null
+          preferred_children_count: number | null
           qualities: string[]
           updated_at: string
         }
@@ -206,6 +207,7 @@ export type Database = {
           max_age?: number | null
           max_distance_km?: number | null
           min_age?: number | null
+          preferred_children_count?: number | null
           qualities?: string[]
           updated_at?: string
         }
@@ -215,6 +217,7 @@ export type Database = {
           max_age?: number | null
           max_distance_km?: number | null
           min_age?: number | null
+          preferred_children_count?: number | null
           qualities?: string[]
           updated_at?: string
         }

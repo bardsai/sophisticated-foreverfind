@@ -122,6 +122,16 @@ export const DEAL_BREAKER_OPTIONS: Option[] = [
   { value: 'Unemployment', label: 'Unemployment' },
 ];
 
+export const ANY_CHILDREN_COUNT = 'any';
+export const PARTNER_CHILDREN_COUNT_OPTIONS: Option[] = [
+  { value: ANY_CHILDREN_COUNT, label: 'No preference' },
+  { value: '0', label: 'No children' },
+  ...Array.from({ length: 20 }, (_, index) => {
+    const count = index + 1;
+    return { value: String(count), label: `${count} ${count === 1 ? 'child' : 'children'}` };
+  }),
+];
+
 // Presets rather than a raw km input — most people can't estimate distance
 // in kilometers accurately, and a wrong guess here just means bad matches
 // rather than a hard error, so coarse buckets are the better trade-off.

@@ -9,7 +9,13 @@ import { SelectField } from '@/components/select-field';
 import { TextField } from '@/components/text-field';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { DEAL_BREAKER_OPTIONS, DISTANCE_OPTIONS, QUALITY_OPTIONS } from '@/constants/onboarding-options';
+import {
+  ANY_CHILDREN_COUNT,
+  DEAL_BREAKER_OPTIONS,
+  DISTANCE_OPTIONS,
+  PARTNER_CHILDREN_COUNT_OPTIONS,
+  QUALITY_OPTIONS,
+} from '@/constants/onboarding-options';
 import { MaxContentWidth, Spacing } from '@/constants/theme';
 import { useSession } from '@/hooks/use-session';
 import { friendlySaveError } from '@/lib/friendly-error';
@@ -27,6 +33,7 @@ export default function EditPartnerPreferencesScreen() {
   const [loading, setLoading] = useState(true);
   const [minAge, setMinAge] = useState('');
   const [maxAge, setMaxAge] = useState('');
+  const [partnerChildrenCount, setPartnerChildrenCount] = useState(ANY_CHILDREN_COUNT);
   const [qualities, setQualities] = useState<string[]>([]);
   const [dealBreakers, setDealBreakers] = useState<string[]>([]);
   const [maxDistanceKm, setMaxDistanceKm] = useState('');
@@ -47,6 +54,11 @@ export default function EditPartnerPreferencesScreen() {
         if (data) {
           setMinAge(data.min_age ? String(data.min_age) : '');
           setMaxAge(data.max_age ? String(data.max_age) : '');
+          setPartnerChildrenCount(
+            data.preferred_children_count === null
+              ? ANY_CHILDREN_COUNT
+              : String(data.preferred_children_count),
+          );
           setQualities(data.qualities);
           setDealBreakers(data.deal_breakers);
           setMaxDistanceKm(data.max_distance_km ? String(data.max_distance_km) : '');
@@ -81,6 +93,8 @@ export default function EditPartnerPreferencesScreen() {
       id: userId,
       min_age: Number.isFinite(minAgeValue) && minAge ? minAgeValue : null,
       max_age: Number.isFinite(maxAgeValue) && maxAge ? maxAgeValue : null,
+      preferred_children_count:
+        partnerChildrenCount === ANY_CHILDREN_COUNT ? null : Number(partnerChildrenCount),
       qualities,
       deal_breakers: dealBreakers,
       max_distance_km: Number.isFinite(distanceValue) && maxDistanceKm ? distanceValue : null,
@@ -127,6 +141,18 @@ export default function EditPartnerPreferencesScreen() {
                   containerStyle={styles.ageInput}
                 />
               </View>
+            </Section>
+
+            <Section title="Children in a match">
+              <SelectField
+                label="How many children does your ideal match have?"
+                value={partnerChildrenCount}
+                options={PARTNER_CHILDREN_COUNT_OPTIONS}
+                onChange={setPartnerChildrenCount}
+              />
+              <ThemedText type="small" themeColor="textSecondary">
+                Choose an exact number, or select No preference to consider any number of children.
+              </ThemedText>
             </Section>
 
             <Section title="Qualities that matter to you">

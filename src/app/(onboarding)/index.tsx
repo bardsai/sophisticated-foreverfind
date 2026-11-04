@@ -19,6 +19,7 @@ import { SegmentedProgress } from '@/components/onboarding/segmented-progress';
 import { Stepper } from '@/components/onboarding/stepper';
 import { HeightField, heightRangeError } from '@/components/height-field';
 import { PrimaryButton } from '@/components/primary-button';
+import { SelectField } from '@/components/select-field';
 import { TextField } from '@/components/text-field';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -30,6 +31,8 @@ import {
   GENDER_OPTIONS,
   GENOTYPE_OPTIONS,
   MARITAL_STATUS_OPTIONS,
+  ANY_CHILDREN_COUNT,
+  PARTNER_CHILDREN_COUNT_OPTIONS,
   PHYSIQUE_OPTIONS,
   QUALITY_OPTIONS,
   RELIGION_OPTIONS,
@@ -59,7 +62,8 @@ type Step =
     })
   | (StepBase & { kind: 'height'; field: keyof Answers })
   | (StepBase & { kind: 'family' })
-  | (StepBase & { kind: 'partner-age' });
+  | (StepBase & { kind: 'partner-age' })
+  | (StepBase & { kind: 'partner-children' });
 
 type Answers = {
   gender: string | null;
@@ -80,6 +84,7 @@ type Answers = {
   bio: string;
   partner_min_age: string;
   partner_max_age: string;
+  partner_children_count: string;
   partner_qualities: string[];
   partner_deal_breakers: string[];
   partner_max_distance_km: string;
@@ -169,7 +174,12 @@ const STEPS: Step[] = [
     title: "What's your marital status?",
     options: MARITAL_STATUS_OPTIONS,
   },
-  { key: 'family', kind: 'family', title: 'Children' },
+  {
+    key: 'family',
+    kind: 'family',
+    title: 'Your family',
+    subtitle: 'These questions are about you and your children, not a potential match.',
+  },
   {
     key: 'genotype',
     kind: 'select',
@@ -188,6 +198,12 @@ const STEPS: Step[] = [
     multiline: true,
   },
   { key: 'partner-age', kind: 'partner-age', title: "What age range interests you?" },
+  {
+    key: 'partner-children',
+    kind: 'partner-children',
+    title: 'Would you be comfortable dating someone with children?',
+    subtitle: 'Choose the exact number of children they have, or choose no preference.',
+  },
   {
     key: 'partner-qualities',
     kind: 'chips',
@@ -251,6 +267,7 @@ export default function OnboardingScreen() {
     bio: profile?.bio ?? '',
     partner_min_age: '',
     partner_max_age: '',
+    partner_children_count: ANY_CHILDREN_COUNT,
     partner_qualities: [],
     partner_deal_breakers: [],
     partner_max_distance_km: '',
@@ -342,6 +359,10 @@ export default function OnboardingScreen() {
       id: userId,
       min_age: Number.isFinite(minAge) && answers.partner_min_age ? minAge : null,
       max_age: Number.isFinite(maxAge) && answers.partner_max_age ? maxAge : null,
+      preferred_children_count:
+        answers.partner_children_count === ANY_CHILDREN_COUNT
+          ? null
+          : Number(answers.partner_children_count),
       qualities: answers.partner_qualities,
       deal_breakers: answers.partner_deal_breakers,
       max_distance_km:
@@ -499,16 +520,21 @@ export default function OnboardingScreen() {
 
               {current.kind === 'family' ? (
                 <View style={styles.familyStep}>
+                  <ThemedText type="smallBold" themeColor="textSecondary" style={styles.centerText}>
+                    How many children do you have?
+                  </ThemedText>
                   <Stepper
                     value={answers.children_count}
                     onChange={(value) => set('children_count', value)}
                   />
                   <ThemedText themeColor="textSecondary" style={styles.centerText}>
-                    {answers.children_count === 0 ? 'No children' : 'Number of children'}
+                    {answers.children_count === 0
+                      ? 'No children'
+                      : `${answers.children_count} ${answers.children_count === 1 ? 'child' : 'children'}`}
                   </ThemedText>
 
                   <ThemedText type="smallBold" themeColor="textSecondary" style={styles.centerText}>
-                    Do you want (more) children?
+                    Would you like to have (more) children?
                   </ThemedText>
                   <View style={styles.chipGrid}>
                     {WANTS_CHILDREN_OPTIONS.map((option) => (
@@ -550,6 +576,15 @@ export default function OnboardingScreen() {
                     style={styles.ageInput}
                   />
                 </View>
+              ) : null}
+
+              {current.kind === 'partner-children' ? (
+                <SelectField
+                  label="How many children does your ideal match have?"
+                  value={answers.partner_children_count}
+                  options={PARTNER_CHILDREN_COUNT_OPTIONS}
+                  onChange={(value) => set('partner_children_count', value)}
+                />
               ) : null}
             </Animated.View>
 
