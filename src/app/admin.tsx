@@ -3,6 +3,7 @@ import { Redirect, Stack, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { SymbolView, type AndroidSymbol, type SFSymbol } from 'expo-symbols';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -28,6 +29,7 @@ type PendingPhoto = Database['public']['Tables']['photo_reviews']['Row'] & {
 };
 
 export default function AdminScreen() {
+  const theme = useTheme();
   const { isAdmin, loading: adminLoading } = useIsAdmin();
   const [requests, setRequests] = useState<PendingRequest[]>([]);
   const [reports, setReports] = useState<OpenReport[]>([]);
@@ -122,7 +124,23 @@ export default function AdminScreen() {
       <Stack.Screen options={{ headerShown: true, title: 'Admin' }} />
       <SafeAreaView style={styles.flex} edges={['bottom']}>
         <ScrollView contentContainerStyle={styles.content}>
-          <Section title={`Pending requests (${requests.length})`}>
+          <View style={[styles.overview, { backgroundColor: theme.backgroundElement, borderColor: theme.border }]}>
+            <View style={[styles.overviewIcon, { backgroundColor: theme.backgroundSelected }]}>
+              <SymbolView name={{ ios: 'sparkles', android: 'auto_awesome', web: 'auto_awesome' }} size={23} tintColor={theme.primary} />
+            </View>
+            <View style={styles.overviewCopy}>
+              <ThemedText type="subtitle">Admin review</ThemedText>
+              <ThemedText type="small" themeColor="textSecondary">Keep introductions safe and thoughtful.</ThemedText>
+            </View>
+            <ThemedText type="smallBold" themeColor="primary">{requests.length + reports.length + photos.length} waiting</ThemedText>
+          </View>
+          <View style={styles.statsRow}>
+            <StatCard icon="heart.text.square" androidIcon="assignment" label="Requests" count={requests.length} />
+            <StatCard icon="flag" androidIcon="flag" label="Reports" count={reports.length} />
+            <StatCard icon="person.crop.square" androidIcon="account_box" label="Photos" count={photos.length} />
+          </View>
+
+          <Section icon="heart.text.square" androidIcon="assignment" title={`Pending requests · ${requests.length}`}>
             {requests.length === 0 ? (
               <ThemedText themeColor="textSecondary" style={styles.empty}>
                 No requests waiting for review.
@@ -134,7 +152,7 @@ export default function AdminScreen() {
             )}
           </Section>
 
-          <Section title={`Open reports (${reports.length})`}>
+          <Section icon="flag" androidIcon="flag" title={`Open reports · ${reports.length}`}>
             {reports.length === 0 ? (
               <ThemedText themeColor="textSecondary" style={styles.empty}>
                 No open reports.
@@ -146,7 +164,7 @@ export default function AdminScreen() {
             )}
           </Section>
 
-          <Section title={`Pending photos (${photos.length})`}>
+          <Section icon="person.crop.square" androidIcon="account_box" title={`Pending photos · ${photos.length}`}>
             {photos.length === 0 ? (
               <ThemedText themeColor="textSecondary" style={styles.empty}>
                 No photos waiting for review.
@@ -163,15 +181,26 @@ export default function AdminScreen() {
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({ title, icon, androidIcon, children }: { title: string; icon: SFSymbol; androidIcon: AndroidSymbol; children: React.ReactNode }) {
+  const theme = useTheme();
   return (
     <View style={styles.section}>
-      <ThemedText type="smallBold" themeColor="textSecondary">
-        {title.toUpperCase()}
-      </ThemedText>
+      <View style={styles.sectionHeading}>
+        <SymbolView name={{ ios: icon, android: androidIcon, web: androidIcon }} size={18} tintColor={theme.primary} />
+        <ThemedText type="smallBold">{title}</ThemedText>
+      </View>
       <View style={styles.sectionList}>{children}</View>
     </View>
   );
+}
+
+function StatCard({ icon, androidIcon, label, count }: { icon: SFSymbol; androidIcon: AndroidSymbol; label: string; count: number }) {
+  const theme = useTheme();
+  return <View style={[styles.statCard, { backgroundColor: theme.backgroundElement, borderColor: theme.border }]}>
+    <SymbolView name={{ ios: icon, android: androidIcon, web: androidIcon }} size={18} tintColor={theme.primary} />
+    <ThemedText type="subtitle">{count}</ThemedText>
+    <ThemedText type="small" themeColor="textSecondary">{label}</ThemedText>
+  </View>;
 }
 
 function RequestRow({
@@ -333,9 +362,15 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.four,
     gap: Spacing.three,
   },
+  overview: { flexDirection: 'row', alignItems: 'center', gap: Spacing.three, borderWidth: 1, borderRadius: 20, padding: Spacing.three },
+  overviewIcon: { width: 48, height: 48, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
+  overviewCopy: { flex: 1, gap: 2 },
+  statsRow: { flexDirection: 'row', gap: Spacing.two },
+  statCard: { flex: 1, alignItems: 'center', gap: Spacing.one, borderWidth: 1, borderRadius: 16, paddingVertical: Spacing.three },
   section: {
     gap: Spacing.two,
   },
+  sectionHeading: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two },
   sectionList: {
     gap: Spacing.three,
   },

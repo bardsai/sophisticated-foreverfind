@@ -11,6 +11,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { SymbolView } from 'expo-symbols';
 import Animated from 'react-native-reanimated';
 
 import { ChipOption } from '@/components/onboarding/chip-option';
@@ -405,6 +406,7 @@ export default function OnboardingScreen() {
           <View style={styles.header}>
             {step > 0 ? (
               <Pressable onPress={goBack} hitSlop={8} style={styles.backButton}>
+                <SymbolView name={{ ios: 'chevron.left', android: 'arrow_back', web: 'arrow_back' }} size={16} tintColor={theme.primary} />
                 <ThemedText themeColor="textSecondary" type="smallBold">
                   Back
                 </ThemedText>
@@ -443,7 +445,10 @@ export default function OnboardingScreen() {
                     ) : photoUrl ? (
                       <Image source={{ uri: photoUrl }} style={styles.photoImage} />
                     ) : (
-                      <ThemedText themeColor="textSecondary">Add photo</ThemedText>
+                      <View style={styles.photoPrompt}>
+                        <SymbolView name={{ ios: 'camera', android: 'photo_camera', web: 'photo_camera' }} size={30} tintColor={theme.primary} />
+                        <ThemedText themeColor="textSecondary" type="smallBold">Add photo</ThemedText>
+                      </View>
                     )}
                   </Pressable>
                   <Pressable onPress={() => pickPhoto('camera')} hitSlop={8}>
@@ -621,6 +626,10 @@ const styles = StyleSheet.create({
   },
   backButton: {
     width: 44,
+    minHeight: 44,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   progressWrapper: {
     flex: 1,
@@ -665,6 +674,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     overflow: 'hidden',
   },
+  photoPrompt: { alignItems: 'center', gap: Spacing.one },
   photoImage: {
     width: '100%',
     height: '100%',
