@@ -1,13 +1,15 @@
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import { Colors } from '@/constants/theme';
 import { ProfileProvider, useProfile } from '@/hooks/use-profile';
+import { useIsAdmin } from '@/hooks/use-is-admin';
 import { usePushNotifications } from '@/hooks/use-push-notifications';
 import { SessionProvider, useSession } from '@/hooks/use-session';
 import { useFonts } from 'expo-font';
-import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
+import { DarkTheme, DefaultTheme, router, Stack, ThemeProvider } from 'expo-router';
 import Head from 'expo-router/head';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 
 SplashScreen.preventAutoHideAsync();
@@ -69,9 +71,10 @@ export default function RootLayout() {
 function RootNavigator() {
   const { session, isLoading: sessionLoading, isPasswordRecovery } = useSession();
   const { profile, isLoading: profileLoading } = useProfile();
+  const { isAdmin, loading: adminLoading } = useIsAdmin();
   usePushNotifications();
 
-  const ready = !sessionLoading && (!session || !profileLoading);
+  const ready = !sessionLoading && (!session || (!profileLoading && !adminLoading));
 
   // Don't mount the Stack until auth state is actually known. Before that,
   // every Stack.Protected guard below is false at once, leaving only the two
@@ -86,6 +89,13 @@ function RootNavigator() {
   // isPasswordRecovery takes priority over the normal onboarded/tabs split
   // so they land on update-password instead of straight into the app.
   const isOnboarded = isAuthenticated && !isPasswordRecovery && !!profile?.onboarding_completed_at;
+  const isRegularUser = isAuthenticated && !isPasswordRecovery && !isAdmin;
+
+  useEffect(() => {
+    if (ready && isAuthenticated && isAdmin && !isPasswordRecovery) {
+      router.replace('/admin');
+    }
+  }, [ready, isAuthenticated, isAdmin, isPasswordRecovery]);
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
@@ -93,18 +103,21 @@ function RootNavigator() {
         <Stack.Screen name="update-password" />
       </Stack.Protected>
 
-      <Stack.Protected guard={isAuthenticated && !isPasswordRecovery && isOnboarded}>
+      <Stack.Protected guard={isAuthenticated && !isPasswordRecovery && isAdmin}>
+        <Stack.Screen name="admin" />
+      </Stack.Protected>
+
+      <Stack.Protected guard={isRegularUser && isOnboarded}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="profile/[id]" />
         <Stack.Screen name="edit-profile" />
         <Stack.Screen name="edit-partner-preferences" />
         <Stack.Screen name="blocked-users" />
         <Stack.Screen name="delete-account" />
-        <Stack.Screen name="admin" />
         <Stack.Screen name="chat/[matchId]" />
       </Stack.Protected>
 
-      <Stack.Protected guard={isAuthenticated && !isPasswordRecovery && !isOnboarded}>
+      <Stack.Protected guard={isRegularUser && !isOnboarded}>
         <Stack.Screen name="(onboarding)" />
       </Stack.Protected>
 

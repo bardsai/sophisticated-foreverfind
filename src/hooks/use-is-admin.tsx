@@ -8,21 +8,31 @@ export function useIsAdmin() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Every caller only uses this alongside an authenticated session (it's
-  // consulted from screens already behind the auth gate), so there's no
-  // signed-out state to reset here — see ProfileProvider for the same
-  // pattern.
   useEffect(() => {
-    if (!session) return;
+    let active = true;
+    if (!session) {
+      setIsAdmin(false);
+      setLoading(false);
+      return () => {
+        active = false;
+      };
+    }
+
+    setLoading(true);
     supabase
       .from('user_roles')
       .select('role')
       .eq('user_id', session.user.id)
-      .single()
+      .maybeSingle()
       .then(({ data }) => {
+        if (!active) return;
         setIsAdmin(data?.role === 'admin');
         setLoading(false);
       });
+
+    return () => {
+      active = false;
+    };
   }, [session]);
 
   return { isAdmin, loading };

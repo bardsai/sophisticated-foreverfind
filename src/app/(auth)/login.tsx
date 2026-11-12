@@ -34,8 +34,8 @@ export default function LoginScreen() {
     const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
     setLoading(false);
     if (error) setSubmitError(error.message);
-    // On success, onAuthStateChange flips the session and the root layout's
-    // Stack.Protected guard swaps to the (tabs) group automatically.
+    // On success, onAuthStateChange flips the session and the root layout
+    // routes admins to /admin and regular members to onboarding or the tabs.
   }
 
   return (
