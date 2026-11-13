@@ -41,6 +41,7 @@ export function DateField({
   const theme = useTheme();
   const inputStyle: CSSProperties = {
     width: '100%',
+    minWidth: 0,
     boxSizing: 'border-box',
     minHeight: 48,
     borderWidth: 1.5,
