@@ -76,14 +76,6 @@ function RootNavigator() {
 
   const ready = !sessionLoading && (!session || (!profileLoading && !adminLoading));
 
-  // Don't mount the Stack until auth state is actually known. Before that,
-  // every Stack.Protected guard below is false at once, leaving only the two
-  // unconditional screens (privacy-policy, terms) available — expo-router
-  // then resolves any other deep-linked path (e.g. /login, or the magic-link
-  // callback) to the first of those as a fallback, and never revisits it
-  // once the real guard state comes in. The splash overlay covers this.
-  if (!ready) return null;
-
   const isAuthenticated = !!session;
   // A password-reset link authenticates the user via a recovery session —
   // isPasswordRecovery takes priority over the normal onboarded/tabs split
@@ -96,6 +88,14 @@ function RootNavigator() {
       router.replace('/admin');
     }
   }, [ready, isAuthenticated, isAdmin, isPasswordRecovery]);
+
+  // Don't mount the Stack until auth state is actually known. Before that,
+  // every Stack.Protected guard below is false at once, leaving only the two
+  // unconditional screens (privacy-policy, terms) available — expo-router
+  // then resolves any other deep-linked path (e.g. /login, or the magic-link
+  // callback) to the first of those as a fallback, and never revisits it
+  // once the real guard state comes in. The splash overlay covers this.
+  if (!ready) return null;
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
