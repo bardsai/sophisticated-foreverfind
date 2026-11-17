@@ -1,87 +1,100 @@
-import DateTimePicker, { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
-import { Platform, Pressable, StyleSheet, View } from 'react-native';
+import { Host, Picker } from '@expo/ui';
+import { useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import {
+  type DateFieldProps,
+  type DateParts,
+  getDateDays,
+  getDateMonths,
+  getDateParts,
+  getDateYears,
+  MONTHS,
+  normalizeDateParts,
+} from '@/components/date-field-utils';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
-export type DateFieldProps = {
-  label: string;
-  value: Date | null;
-  onChange: (date: Date | null) => void;
-  error?: string;
-  placeholder?: string;
-  maximumDate?: Date;
-  minimumDate?: Date;
-};
-
-function formatDate(date: Date) {
-  return date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
-}
+export type { DateFieldProps } from '@/components/date-field-utils';
 
 export function DateField({
   label,
   value,
   onChange,
   error,
-  placeholder = 'Select a date',
   maximumDate,
   minimumDate,
 }: DateFieldProps) {
   const theme = useTheme();
-  function openPicker() {
-    const initialValue = value ?? maximumDate ?? new Date();
-    if (Platform.OS === 'android') {
-      DateTimePickerAndroid.open({
-        value: initialValue,
-        mode: 'date',
-        maximumDate,
-        minimumDate,
-        onChange: (event, date) => {
-          if (event.type === 'set' && date) onChange(date);
-        },
-      });
+  const [parts, setParts] = useState(() => getDateParts(value));
+  const years = getDateYears(minimumDate, maximumDate);
+  const months = parts.year
+    ? getDateMonths(Number(parts.year), minimumDate, maximumDate)
+    : Array.from({ length: 12 }, (_, i) => i + 1);
+  const days =
+    parts.year && parts.month
+      ? getDateDays(Number(parts.year), Number(parts.month), minimumDate, maximumDate)
+      : [];
+
+  function updateParts(nextParts: DateParts) {
+    const updated = normalizeDateParts(nextParts, minimumDate, maximumDate);
+    setParts(updated);
+    if (updated.year && updated.month && updated.day) {
+      onChange(new Date(Number(updated.year), Number(updated.month) - 1, Number(updated.day)));
+    } else {
+      onChange(null);
     }
   }
-
-  const initialValue = value ?? maximumDate ?? new Date();
 
   return (
     <ThemedView style={styles.container}>
       <ThemedText type="smallBold" themeColor="textSecondary">{label}</ThemedText>
-      {Platform.OS === 'ios' ? (
-        <View style={[styles.pickerFrame, { borderColor: error ? theme.danger : theme.border, backgroundColor: theme.backgroundElement }]}>
-          <DateTimePicker
-            value={initialValue}
-            mode="date"
-            display="spinner"
-            maximumDate={maximumDate}
-            minimumDate={minimumDate}
-            onChange={(_event, date) => {
-              if (date) onChange(date);
-            }}
-            style={styles.picker}
-          />
-        </View>
-      ) : (
-        <Pressable
-          onPress={openPicker}
-          accessibilityRole="button"
-          accessibilityLabel={label}
-          style={[
-            styles.input,
-            {
-              borderColor: error ? theme.danger : theme.border,
-              backgroundColor: theme.backgroundElement,
-            },
-          ]}
-          >
-          <ThemedText style={{ color: value ? theme.text : theme.textSecondary }}>
-            {value ? formatDate(value) : placeholder}
-          </ThemedText>
-        </Pressable>
-      )}
+      <View style={styles.pickerRow}>
+        <Host style={[styles.pickerHost, styles.nativePickerField, { borderColor: error ? theme.danger : theme.border, backgroundColor: theme.backgroundElement }]} seedColor={theme.primary}>
+          <Picker
+            selectedValue={parts.day}
+            onValueChange={(day) => updateParts({ ...parts, day: String(day) })}
+            appearance="menu"
+            enabled={days.length > 0}
+            testID="birthdate-day">
+            <Picker.Item label="Day" value="" />
+            {days.map((day) => (
+              <Picker.Item key={day} label={String(day)} value={String(day)} />
+            ))}
+          </Picker>
+        </Host>
+        <Host style={[styles.pickerHost, styles.nativePickerField, { borderColor: error ? theme.danger : theme.border, backgroundColor: theme.backgroundElement }]} seedColor={theme.primary}>
+          <Picker
+            selectedValue={parts.month}
+            onValueChange={(month) => updateParts({ ...parts, month: String(month), day: parts.day })}
+            appearance="menu"
+            enabled={months.length > 0}
+            testID="birthdate-month">
+            <Picker.Item label="Month" value="" />
+            {months.map((month) => (
+              <Picker.Item key={month} label={MONTHS[month - 1]} value={String(month)} />
+            ))}
+          </Picker>
+        </Host>
+        <Host style={[styles.pickerHost, styles.nativePickerField, { borderColor: error ? theme.danger : theme.border, backgroundColor: theme.backgroundElement }]} seedColor={theme.primary}>
+          <Picker
+            selectedValue={parts.year}
+            onValueChange={(year) => updateParts({ ...parts, year: String(year) })}
+            appearance="menu"
+            enabled={years.length > 0}
+            testID="birthdate-year">
+            <Picker.Item label="Year" value="" />
+            {years.map((year) => (
+              <Picker.Item key={year} label={year} value={year} />
+            ))}
+          </Picker>
+        </Host>
+      </View>
+      <ThemedText type="small" themeColor="textSecondary">
+        Select the month and year first to enable day selection.
+      </ThemedText>
       {error ? <ThemedText type="small" themeColor="danger">{error}</ThemedText> : null}
     </ThemedView>
   );
@@ -89,16 +102,19 @@ export function DateField({
 
 const styles = StyleSheet.create({
   container: { gap: Spacing.one, backgroundColor: 'transparent', width: '100%' },
-  pickerFrame: { borderWidth: 1.5, borderRadius: Spacing.two, overflow: 'hidden', minHeight: 164, justifyContent: 'center' },
-  picker: { height: 164, alignSelf: 'stretch' },
-  input: {
-    borderWidth: 1.5,
-    borderRadius: Spacing.two,
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.two + 2,
-    justifyContent: 'center',
+  pickerRow: {
+    flexDirection: 'row',
+    gap: Spacing.two,
     minHeight: 48,
     width: '100%',
-    minWidth: 0,
+    alignItems: 'center',
+  },
+  pickerHost: { flex: 1, minWidth: 0 },
+  nativePickerField: {
+    borderWidth: 1.5,
+    borderRadius: Spacing.two,
+    minHeight: 48,
+    justifyContent: 'center',
+    paddingHorizontal: Spacing.two,
   },
 });

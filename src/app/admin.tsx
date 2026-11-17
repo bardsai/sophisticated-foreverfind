@@ -7,8 +7,10 @@ import { SymbolView, type AndroidSymbol, type SFSymbol } from 'expo-symbols';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { SettingsRow } from '@/components/settings-row';
 import { MaxContentWidth, Spacing } from '@/constants/theme';
 import { useIsAdmin } from '@/hooks/use-is-admin';
+import { useSession } from '@/hooks/use-session';
 import { useTheme } from '@/hooks/use-theme';
 import { sendPushNotification } from '@/lib/notify';
 import { calculateAge } from '@/lib/profile-utils';
@@ -31,6 +33,7 @@ type PendingPhoto = Database['public']['Tables']['photo_reviews']['Row'] & {
 export default function AdminScreen() {
   const theme = useTheme();
   const { isAdmin, loading: adminLoading } = useIsAdmin();
+  const { signOut } = useSession();
   const [requests, setRequests] = useState<PendingRequest[]>([]);
   const [reports, setReports] = useState<OpenReport[]>([]);
   const [photos, setPhotos] = useState<PendingPhoto[]>([]);
@@ -175,6 +178,7 @@ export default function AdminScreen() {
               ))
             )}
           </Section>
+          <SettingsRow label="Log out" themeColor="danger" onPress={() => void signOut()} />
         </ScrollView>
       </SafeAreaView>
     </ThemedView>

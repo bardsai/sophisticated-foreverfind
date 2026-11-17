@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router';
 import { useState } from 'react';
-import { Alert, StyleSheet, View } from 'react-native';
+import { Alert, Platform, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PrimaryButton } from '@/components/primary-button';
@@ -20,22 +20,35 @@ export default function DeleteAccountScreen() {
   async function performDelete() {
     setDeleting(true);
     setError(undefined);
-    const { error: fnError } = await supabase.functions.invoke('delete-account');
-    setDeleting(false);
-    if (fnError) {
-      setError(fnError.message);
-      return;
+    try {
+      const { error: fnError } = await supabase.functions.invoke('delete-account');
+      if (fnError) {
+        setError(fnError.message);
+        return;
+      }
+      await signOut();
+    } catch (deleteError) {
+      setError(deleteError instanceof Error ? deleteError.message : 'Account deletion failed. Please try again.');
+    } finally {
+      setDeleting(false);
     }
-    await signOut();
   }
 
   function confirmDelete() {
+    const message =
+      'This permanently deletes your profile, matches, and requests. This cannot be undone.';
+
+    if (Platform.OS === 'web') {
+      if (window.confirm(`Delete your account?\n\n${message}`)) void performDelete();
+      return;
+    }
+
     Alert.alert(
       'Delete your account?',
-      'This permanently deletes your profile, matches, and requests. This cannot be undone.',
+      message,
       [
         { text: 'Cancel', style: 'cancel' },
-        { text: 'Delete', style: 'destructive', onPress: performDelete },
+        { text: 'Delete', style: 'destructive', onPress: () => void performDelete() },
       ],
     );
   }
