@@ -13,6 +13,7 @@ import { entranceAnimation, fadeInAnimation } from '@/constants/motion';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { supabase } from '@/lib/supabase';
+import { friendlyAuthEmailError } from '@/lib/friendly-error';
 import {
   birthdateError,
   displayNameError,
@@ -75,10 +76,16 @@ export default function SignUpScreen() {
     setLoading(false);
 
     if (error) {
-      setSubmitError(error.message);
+      setSubmitError(friendlyAuthEmailError(error.message));
       return;
     }
     if (!data.session) {
+      if (!data.user?.confirmation_sent_at) {
+        setSubmitError(
+          'The confirmation email could not be sent. Please check the address, wait a moment, then try again.',
+        );
+        return;
+      }
       // Email confirmation is required before a session exists; the profile
       // row was already created server-side from the metadata above.
       router.push({ pathname: '/check-email', params: { email: email.trim() } });

@@ -10,6 +10,7 @@ import { fadeInAnimation } from '@/constants/motion';
 import { Spacing } from '@/constants/theme';
 import { useSession } from '@/hooks/use-session';
 import { supabase } from '@/lib/supabase';
+import { friendlyAuthEmailError } from '@/lib/friendly-error';
 
 const RESEND_COOLDOWN_SECONDS = 60;
 
@@ -35,7 +36,11 @@ export default function CheckEmailScreen() {
     clearAuthLinkError();
     const { error } = isRecovery
       ? await supabase.auth.resetPasswordForEmail(email, { redirectTo: makeRedirectUri() })
-      : await supabase.auth.resend({ type: 'signup', email });
+      : await supabase.auth.resend({
+          type: 'signup',
+          email,
+          options: { emailRedirectTo: makeRedirectUri() },
+        });
     setResending(false);
     if (error) {
       setResendError(error.message);
@@ -51,7 +56,7 @@ export default function CheckEmailScreen() {
       subtitle={
         isRecovery
           ? `We sent a password reset link to ${email}. Open it on this device to choose a new password.`
-          : `We sent a confirmation link to ${email}. Open it on this device to finish creating your account.`
+          : `A confirmation link was requested for ${email}. Open it on this device to finish creating your account.`
       }
       footer={
         <View style={styles.footerRow}>
@@ -79,14 +84,21 @@ export default function CheckEmailScreen() {
       {resendError ? (
         <Animated.View entering={fadeInAnimation()}>
           <ThemedText themeColor="danger" type="small" style={styles.centerText}>
-            {resendError}
+            {friendlyAuthEmailError(resendError)}
           </ThemedText>
         </Animated.View>
       ) : null}
       {justResent && !resendError ? (
         <Animated.View entering={fadeInAnimation()}>
           <ThemedText themeColor="primary" type="small" style={styles.centerText}>
-            Link resent — check your inbox.
+            Link resent — check your inbox and spam folder.
+          </ThemedText>
+        </Animated.View>
+      ) : null}
+      {!isRecovery ? (
+        <Animated.View entering={fadeInAnimation()}>
+          <ThemedText themeColor="textSecondary" type="small" style={styles.centerText}>
+            It can take a few minutes to arrive. Check your spam or junk folder.
           </ThemedText>
         </Animated.View>
       ) : null}
